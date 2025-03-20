@@ -1,0 +1,247 @@
+.race-track {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background-color: #171717;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.race-background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(#2a2a2a 10%, transparent 10%);
+  background-size: 20px 20px;
+  opacity: 0.2;
+}
+
+.track-lane-markers {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.track-lane {
+  position: absolute;
+  width: 100%;
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.start-line {
+  position: absolute;
+  left: 5%;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  background-color: #00ff00;
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+  animation: pulseLine 2s infinite;
+}
+
+.finish-line {
+  position: absolute;
+  right: 5%;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  background-color: #ff0000;
+  z-index: 10;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  animation: pulseLine 2s infinite;
+}
+
+@keyframes pulseLine {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+.racer {
+  position: absolute;
+  width: 80px;
+  height: 60px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
+  will-change: left, transform;
+}
+
+.racer.finished {
+  z-index: 15;
+  filter: drop-shadow(0 5px 15px rgba(255, 215, 0, 0.7));
+}
+
+.racer:hover {
+  z-index: 20;
+  transform: scale(1.05);
+}
+
+.egg {
+  width: 20px;
+  height: 30px;
+  background-color: #ffffff;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  position: absolute;
+  top: -15px;
+  left: 30px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.spoon {
+  width: 60px;
+  height: 10px;
+  background-color: #d0d0d0;
+  border-radius: 5px;
+  position: absolute;
+  top: 15px;
+  left: 10px;
+  transform: perspective(500px) rotateX(30deg);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.racer-name {
+  position: absolute;
+  top: 30px;
+  width: 120px;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  left: -20px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.winner-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 20px 40px;
+  border-radius: 10px;
+  color: white;
+  text-align: center;
+  z-index: 100;
+  animation: pulse 1s infinite;
+  min-width: 300px;
+}
+
+.winner-overlay h2 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(255, 215, 0, 1);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+}
+
+.countdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 50;
+}
+
+.countdown {
+  font-size: 10rem;
+  color: white;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+  animation: countdown-pulse 1s infinite;
+}
+
+@keyframes countdown-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+.race-stats {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 30;
+  background-color: rgba(0, 0, 0, 0.7);
+  padding: 10px 15px;
+  border-radius: 8px;
+  color: white;
+  font-size: 1.5rem;
+  font-family: monospace;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.race-timer {
+  color: #00ffaa;
+  text-shadow: 0 0 5px rgba(0, 255, 170, 0.8);
+}
+
+.finish-time {
+  position: absolute;
+  top: -25px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: #ffcc00;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .racer {
+    width: 60px;
+  }
+  .spoon {
+    width: 45px;
+  }
+  .racer-name {
+    width: 100px;
+    left: -20px;
+  }
+  .countdown {
+    font-size: 6rem;
+  }
+  .race-stats {
+    font-size: 1.2rem;
+  }
+} 
