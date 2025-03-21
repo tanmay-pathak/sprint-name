@@ -1,5 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import '../styles/SprintNameInput.css'
+import { useMutation, useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { Id } from "../../convex/_generated/dataModel";
 
 interface SprintNameInputProps {
   onStart: (names: string[], duration: number) => void
@@ -16,76 +19,151 @@ const DEFAULT_RACE_DURATION = 10; // 10 seconds default
 
 const SprintNameInput = ({ onStart }: SprintNameInputProps) => {
   const [input, setInput] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const [raceDuration, setRaceDuration] = useState(DEFAULT_RACE_DURATION)
+  const [isAdding, setIsAdding] = useState(false)
+  const [isRemoving, setIsRemoving] = useState<string | null>(null)
+  
+  // Convex queries and mutations
+  const sprintNames = useQuery(api.sprintNames.listActiveSprintNames) || [];
+  const addSprintName = useMutation(api.sprintNames.addSprintName);
+  const clearActiveSprintNames = useMutation(api.sprintNames.clearActiveSprintNames);
+  const deactivateSprintName = useMutation(api.sprintNames.deactivateSprintName);
 
-  useEffect(() => {
-    // Check if we have valid input
-    const names = getNamesList(input);
-    
-    if (names.length === 0) {
-      setError(null);
-    } else if (names.length === 1) {
-      setError("Please enter at least 2 names");
-    } else {
-      setError(null);
+  const handleAddName = async () => {
+    if (input.trim() && !isAdding) {
+      try {
+        setIsAdding(true);
+        await addSprintName({ name: input.trim() });
+        setInput('');
+      } catch (error) {
+        console.error("Error adding name:", error);
+      } finally {
+        setIsAdding(false);
+      }
     }
-  }, [input]);
+  }
 
-  const getNamesList = (text: string): string[] => {
-    return text
-      .split('\n')
-      .map(name => name.trim())
-      .filter(name => name.length > 0);
+  const handleRandomName = async () => {
+    if (!isAdding) {
+      try {
+        setIsAdding(true);
+        const randomName = generateRandomName();
+        await addSprintName({ name: randomName });
+      } catch (error) {
+        console.error("Error adding random name:", error);
+      } finally {
+        setIsAdding(false);
+      }
+    }
+  }
+
+  const handleRemoveName = async (id: Id<"sprintNames">) => {
+    if (!isRemoving) {
+      try {
+        setIsRemoving(id);
+        await deactivateSprintName({ id });
+      } catch (error) {
+        console.error("Error removing name:", error);
+      } finally {
+        setIsRemoving(null);
+      }
+    }
+  }
+
+  const generateRandomName = (): string => {
+    const randomIndex = Math.floor(Math.random() * SPRINT_NAME_SUGGESTIONS.length);
+    return SPRINT_NAME_SUGGESTIONS[randomIndex];
+  }
+
+  const handleClearAll = async () => {
+    if (!isAdding) {
+      try {
+        setIsAdding(true);
+        await clearActiveSprintNames();
+      } catch (error) {
+        console.error("Error clearing names:", error);
+      } finally {
+        setIsAdding(false);
+      }
+    }
   }
 
   const handleStart = () => {
-    const names = getNamesList(input);
-    if (names.length >= 2) {
+    if (sprintNames.length >= 2) {
+      const names = sprintNames.map(item => item.name);
       onStart(names, raceDuration);
     }
   }
 
-  const handleAddRandomNames = () => {
-    const randomNames = generateRandomNames(3).join('\n');
-    setInput(prev => {
-      const currentNames = prev.trim();
-      return currentNames ? `${currentNames}\n${randomNames}` : randomNames;
-    });
-  }
-
-  const generateRandomNames = (count: number): string[] => {
-    const shuffled = [...SPRINT_NAME_SUGGESTIONS].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  }
-
-  const handleClear = () => {
-    setInput('');
+  // Get a random placeholder from suggestions
+  const getRandomPlaceholder = () => {
+    const randomIndex = Math.floor(Math.random() * SPRINT_NAME_SUGGESTIONS.length);
+    return `Try: "${SPRINT_NAME_SUGGESTIONS[randomIndex]}"`;
   }
 
   return (
     <div className="sprint-input-container">
-      <p>Enter one sprint name per line (minimum 2 names):</p>
-      <div className="textarea-container">
-        <textarea
+      <div className="input-group">
+        <input
+          type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Enter sprint names here...
-Example:
-Sonic Sprint
-Rocket Race
-Thunder Team"
-          className={error ? 'error' : ''}
+          placeholder={getRandomPlaceholder()}
+          className="name-input"
+          disabled={isAdding}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && !isAdding) {
+              handleAddName();
+            }
+          }}
         />
-        {error && <div className="error-message">{error}</div>}
+        <button 
+          onClick={handleAddName} 
+          className="add-button"
+          disabled={isAdding || !input.trim()}
+        >
+          {isAdding ? 'Adding...' : 'Add Name'}
+        </button>
+      </div>
+      
+      <div className="names-list">
+        <h3>Sprint Names ({sprintNames.length})</h3>
+        {sprintNames.length === 0 ? (
+          <p className="empty-message">No names added yet. Add at least 2 names to start the race.</p>
+        ) : (
+          <ul className="names-grid">
+            {sprintNames.map((item) => (
+              <li key={item._id} className="name-item">
+                <span className="name-text">{item.name}</span>
+                <button 
+                  className="remove-name-btn"
+                  onClick={() => handleRemoveName(item._id)}
+                  disabled={isRemoving === item._id}
+                >
+                  {isRemoving === item._id ? '...' : '×'}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       
       <div className="input-actions">
-        <button onClick={handleAddRandomNames} className="secondary-button">
-          Add Random Names
+        <button 
+          onClick={handleRandomName} 
+          className="secondary-button"
+          disabled={isAdding}
+        >
+          <span className="button-icon">🎲</span>
+          {isAdding ? 'Adding...' : 'Add Random Name'}
         </button>
-        <button onClick={handleClear} className="secondary-button">
-          Clear
+        <button 
+          onClick={handleClearAll} 
+          className="secondary-button clear-button"
+          disabled={isAdding || sprintNames.length === 0}
+        >
+          <span className="button-icon">🗑️</span>
+          {isAdding ? 'Clearing...' : 'Clear All'}
         </button>
       </div>
 
@@ -108,10 +186,15 @@ Thunder Team"
       <button
         className="start-button"
         onClick={handleStart}
-        disabled={getNamesList(input).length < 2}
+        disabled={sprintNames.length < 2 || isAdding}
       >
         Start Race! 🏁
       </button>
+
+      {/* Debug info (can be removed later) */}
+      <div className="debug-info">
+        <p>Database Status: {sprintNames ? `Connected (${sprintNames.length} names)` : 'Disconnected'}</p>
+      </div>
     </div>
   )
 }

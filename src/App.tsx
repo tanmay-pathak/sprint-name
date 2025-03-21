@@ -1,28 +1,55 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import SprintNameInput from './components/SprintNameInput'
 import Race2D from './components/Race2D'
+import { useMutation, useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
 
 function App() {
-  const [names, setNames] = useState<string[]>([])
   const [isRacing, setIsRacing] = useState(false)
-  const [winner, setWinner] = useState<string | null>(null)
   const [raceDuration, setRaceDuration] = useState(10)
+  const [isCompletingRace, setIsCompletingRace] = useState(false)
+  
+  // Convex queries and mutations
+  const names = useQuery(api.sprintNames.listActiveSprintNames) || [];
+  const saveWinner = useMutation(api.winners.saveWinner);
+  const latestWinner = useQuery(api.winners.getLatestWinner);
 
-  const handleStartRace = (inputNames: string[], duration: number) => {
-    setNames(inputNames)
-    setRaceDuration(duration)
-    setIsRacing(true)
-    setWinner(null)
+  // Mapping data for the frontend
+  const sprintNames = names.map(n => n.name);
+  const winner = latestWinner?.name || null;
+
+  // Reset isCompletingRace if we're not racing
+  useEffect(() => {
+    if (!isRacing) {
+      setIsCompletingRace(false);
+    }
+  }, [isRacing]);
+
+  const handleStartRace = (names: string[], duration: number) => {
+    setRaceDuration(duration);
+    setIsRacing(true);
   }
 
-  const handleRaceComplete = (winnerName: string) => {
-    setWinner(winnerName)
-    setIsRacing(false)
+  const handleRaceComplete = async (winnerName: string) => {
+    try {
+      // Flag that we're in the completion process
+      setIsCompletingRace(true);
+      
+      // Store the winner in the database
+      await saveWinner({ name: winnerName, raceDuration });
+      
+      // Return to input screen
+      setIsRacing(false);
+    } catch (error) {
+      console.error("Error saving winner:", error);
+      // Still return to input screen even on error
+      setIsRacing(false);
+    }
   }
 
   const handleBackToInput = () => {
-    setIsRacing(false)
+    setIsRacing(false);
   }
 
   return (
@@ -47,11 +74,15 @@ function App() {
         </div>
       ) : (
         <div className="race-container">
-          <button className="back-button" onClick={handleBackToInput}>
-            ← Back
+          <button 
+            className="back-button" 
+            onClick={handleBackToInput}
+            disabled={isCompletingRace}
+          >
+            {isCompletingRace ? 'Finishing...' : '← Back'}
           </button>
           <Race2D 
-            names={names} 
+            names={sprintNames} 
             onRaceComplete={handleRaceComplete} 
             raceDuration={raceDuration}
           />

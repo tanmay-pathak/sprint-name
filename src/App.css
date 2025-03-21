@@ -249,9 +249,14 @@
   transition: all 0.2s;
 }
 
-.back-button:hover {
+.back-button:hover:not(:disabled) {
   background-color: rgba(0, 0, 0, 0.8);
-  transform: scale(1.05);
+  transform: translateY(-2px);
+}
+
+.back-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .app-footer {
