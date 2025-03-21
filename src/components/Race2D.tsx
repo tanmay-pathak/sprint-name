@@ -264,7 +264,7 @@ const Race2D: React.FC<Race2DProps> = ({ names, onRaceComplete, raceDuration = 1
       <div className="race-background">
         <div className="track-lane-markers">
           {racers.map((_, index) => (
-            <div key={`lane-${index}`} className="track-lane" style={{ top: `${10 + index * 80}px` }}></div>
+            <div key={`lane-${index}`} className="track-lane" style={{ top: `${10 + index * 90}px` }}></div>
           ))}
         </div>
       </div>
@@ -288,12 +288,24 @@ const Race2D: React.FC<Race2DProps> = ({ names, onRaceComplete, raceDuration = 1
           className={`racer ${racer.finishTime !== null ? 'finished' : ''} ${racer.boostTime > 0 ? 'boosting' : ''} ${racer.slowTime > 0 ? 'slowing' : ''}`}
           style={{ 
             left: `${5 + racer.position}%`, 
-            top: `${10 + racer.lane * 80}px`,
-            backgroundColor: getRandomColor(racer.lane)
+            top: `${10 + racer.lane * 90}px`,
+            backgroundColor: 'transparent'
           }}
         >
-          <div className="egg" style={{ transform: `rotate(${racer.wobble * 5}deg) translateY(${Math.sin(racer.position) * 2}px)` }}></div>
-          <div className="spoon"></div>
+          <div className="human-racer">
+            <div className="person">
+              <div className="head"></div>
+              <div className="body" style={{ backgroundColor: getRandomColor(racer.lane) }}></div>
+              <div className="arm"></div>
+              <div className="arm arm-extended"></div>
+              <div className="leg leg-left"></div>
+              <div className="leg leg-right"></div>
+            </div>
+            <div className="spoon"></div>
+            <div className="egg" style={{ 
+              transform: `rotate(${racer.wobble * 8}deg) translateY(${Math.sin(racer.position * 2) * 3}px)` 
+            }}></div>
+          </div>
           <div className="racer-name">{racer.name}</div>
           {racer.finishTime !== null && 
             <div className="finish-time">{racer.finishTime.toFixed(2)}s</div>

@@ -69,7 +69,7 @@
 .racer {
   position: absolute;
   width: 80px;
-  height: 60px;
+  height: 70px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -77,6 +77,147 @@
   z-index: 5;
   filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.5));
   will-change: left, transform;
+}
+
+.human-racer {
+  position: relative;
+  width: 80px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: bottom center;
+  animation: slight-bounce 0.4s infinite alternate;
+}
+
+@keyframes slight-bounce {
+  0% { transform: translateY(0) rotate(1deg); }
+  100% { transform: translateY(-2px) rotate(-1deg); }
+}
+
+.racer.boosting .human-racer {
+  animation-duration: 0.2s;
+}
+
+.racer.slowing .human-racer {
+  animation-duration: 0.8s;
+}
+
+.person {
+  position: absolute;
+  width: 45px;
+  height: 60px;
+  z-index: 6;
+  top: -3px;
+}
+
+.head {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #f5d0a9;
+  border-radius: 50%;
+  top: 0;
+  left: 13px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 7;
+}
+
+.head::after {
+  content: "";
+  position: absolute;
+  width: 6px;
+  height: 2px;
+  background-color: #333;
+  border-radius: 2px;
+  bottom: 7px;
+  left: 7px;
+}
+
+.racer.boosting .head {
+  transform: rotate(5deg);
+}
+
+.body {
+  position: absolute;
+  width: 16px;
+  height: 22px;
+  background-color: #3a86ff;
+  top: 18px;
+  left: 15px;
+  border-radius: 6px 6px 3px 3px;
+  z-index: 7;
+}
+
+.arm {
+  position: absolute;
+  width: 12px;
+  height: 4px;
+  background-color: #f5d0a9;
+  top: 23px;
+  left: 5px;
+  transform: rotate(20deg);
+  border-radius: 3px;
+  animation: swing-arm 0.4s infinite alternate;
+}
+
+@keyframes swing-arm {
+  0% { transform: rotate(5deg); }
+  100% { transform: rotate(35deg); }
+}
+
+.arm-extended {
+  width: 22px;
+  left: 28px;
+  top: 24px;
+  transform: rotate(-10deg);
+  z-index: 4;
+  animation: hold-spoon 0.4s infinite alternate;
+}
+
+@keyframes hold-spoon {
+  0% { transform: rotate(-20deg) translateY(0); }
+  100% { transform: rotate(-5deg) translateY(-1px); }
+}
+
+.leg {
+  position: absolute;
+  width: 4px;
+  height: 22px;
+  background-color: #5c4033;
+  bottom: 0;
+  border-radius: 2px;
+  transform-origin: top center;
+}
+
+.leg-left {
+  left: 16px;
+  animation: run-left 0.4s infinite alternate;
+}
+
+.leg-right {
+  left: 26px;
+  animation: run-right 0.4s infinite alternate-reverse;
+}
+
+@keyframes run-left {
+  0% { transform: rotate(-25deg); }
+  100% { transform: rotate(15deg); }
+}
+
+@keyframes run-right {
+  0% { transform: rotate(-15deg); }
+  100% { transform: rotate(25deg); }
+}
+
+.racer.boosting .leg-left,
+.racer.boosting .leg-right {
+  animation-duration: 0.25s;
+}
+
+.racer.slowing .leg-left,
+.racer.slowing .leg-right {
+  animation-duration: 0.8s;
 }
 
 .racer.finished {
@@ -90,31 +231,33 @@
 }
 
 .egg {
-  width: 20px;
-  height: 30px;
+  width: 14px;
+  height: 18px;
   background-color: #ffffff;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   position: absolute;
-  top: -15px;
-  left: 30px;
+  top: 9px;
+  left: 49px;
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  z-index: 10;
 }
 
 .spoon {
-  width: 60px;
-  height: 10px;
+  width: 35px;
+  height: 7px;
   background-color: #d0d0d0;
-  border-radius: 5px;
+  border-radius: 5px 10px 10px 5px;
   position: absolute;
-  top: 15px;
-  left: 10px;
+  top: 26px;
+  left: 45px;
   transform: perspective(500px) rotateX(30deg);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 8;
 }
 
 .racer-name {
   position: absolute;
-  top: 30px;
+  top: 50px;
   width: 120px;
   text-align: center;
   font-weight: bold;
@@ -227,20 +370,81 @@
   border-radius: 4px;
 }
 
+.racer.boosting::after {
+  content: "🔥";
+  position: absolute;
+  bottom: -5px;
+  right: -15px;
+  font-size: 22px;
+  animation: pulse-boost 0.5s infinite;
+}
+
+.racer.slowing::after {
+  content: "😰";
+  position: absolute;
+  bottom: -5px;
+  right: -15px;
+  font-size: 22px;
+  animation: pulse-slow 0.8s infinite;
+}
+
+@keyframes pulse-boost {
+  0% { transform: scale(0.8); }
+  100% { transform: scale(1.2); }
+}
+
+@keyframes pulse-slow {
+  0% { transform: scale(0.9); }
+  100% { transform: scale(1.1); }
+}
+
 @media (max-width: 768px) {
   .racer {
     width: 60px;
+    height: 65px;
   }
+  
+  .human-racer {
+    width: 60px;
+    height: 65px;
+    transform: scale(0.8);
+  }
+  
   .spoon {
-    width: 45px;
+    width: 28px;
+    left: 38px;
+    top: 25px;
   }
+  
+  .egg {
+    width: 12px;
+    height: 16px;
+    left: 42px;
+    top: 8px;
+  }
+  
+  .person {
+    transform: scale(0.9);
+  }
+  
   .racer-name {
     width: 100px;
     left: -20px;
+    top: 45px;
+    font-size: 12px;
   }
+  
+  .racer.boosting::after,
+  .racer.slowing::after {
+    font-size: 18px;
+    right: -12px;
+    bottom: -2px;
+  }
+  
   .countdown {
     font-size: 6rem;
   }
+  
   .race-stats {
     font-size: 1.2rem;
   }
