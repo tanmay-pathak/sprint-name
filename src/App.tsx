@@ -67,10 +67,6 @@ function App() {
           )}
           
           <SprintNameInput onStart={handleStartRace} />
-          
-          <footer className="app-footer">
-            <p>Sprint Name Egg Spoon Race &copy; {new Date().getFullYear()}</p>
-          </footer>
         </div>
       ) : (
         <div className="race-container">

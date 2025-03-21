@@ -190,11 +190,6 @@ const SprintNameInput = ({ onStart }: SprintNameInputProps) => {
       >
         Start Race! 🏁
       </button>
-
-      {/* Debug info (can be removed later) */}
-      <div className="debug-info">
-        <p>Database Status: {sprintNames ? `Connected (${sprintNames.length} names)` : 'Disconnected'}</p>
-      </div>
     </div>
   )
 }
