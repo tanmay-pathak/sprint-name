@@ -11,6 +11,8 @@ A fun and interactive game to help teams select sprint names through a competiti
 - 🎉 Celebratory confetti for the winner
 - 📊 Track race history and previous winners
 - 🎲 Random name generator option for quick races
+- 💾 Persistent storage of race results and sprint names
+- 🔄 Real-time updates across multiple users
 
 ## Technologies Used
 
@@ -19,6 +21,7 @@ A fun and interactive game to help teams select sprint names through a competiti
 - Vite
 - Canvas Confetti
 - CSS Animations
+- Convex (for real-time backend)
 
 ## Installation
 
@@ -33,12 +36,17 @@ A fun and interactive game to help teams select sprint names through a competiti
    npm install
    ```
 
-3. Start the development server:
+3. Set up Convex:
+   ```
+   npx convex dev
+   ```
+
+4. Start the development server:
    ```
    npm run dev
    ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+5. Open your browser and navigate to `http://localhost:5173`
 
 ## Building for Production
 
@@ -50,20 +58,27 @@ npm run build
 
 The build artifacts will be located in the `dist/` directory.
 
+For deploying the Convex backend:
+
+```
+npx convex deploy
+```
+
 ## How to Use
 
 1. Enter sprint name options (one per line) or use the random name generator
 2. Click "Start Race!" to begin
 3. Watch as the egg-and-spoon racers compete
 4. The winner will be your new sprint name
+5. Race results are automatically saved and synchronized across all users
 
-## License
+## Convex Backend
 
-MIT
-
-## Contributing
-
-Contributions, issues, and feature requests are welcome! Feel free to check [issues page](https://github.com/your-username/sprint-name/issues).
+This application uses Convex as a backend service for:
+- Storing sprint name suggestions
+- Recording race results and history
+- Enabling real-time updates across multiple users
+- Managing user sessions
 
 ## Show your support
 
