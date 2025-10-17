@@ -1,11 +1,47 @@
 .sprint-input-container {
   width: 100%;
   max-width: 600px;
-  background-color: rgba(30, 30, 30, 0.8);
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: rgba(22, 22, 40, 0.8);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(129, 140, 248, 0.2);
+  backdrop-filter: blur(14px);
   animation: fadeIn 0.5s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.sprint-input-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top right, rgba(100, 108, 255, 0.35), transparent 55%);
+  opacity: 0.6;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.sprint-input-container > * {
+  position: relative;
+  z-index: 1;
+}
+
+.panel-intro {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.panel-intro h2 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+  color: #ffffff;
+}
+
+.panel-intro p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.5;
 }
 
 @keyframes fadeIn {
@@ -200,6 +236,57 @@ textarea.error {
   text-align: left;
 }
 
+.readiness-meter {
+  background: #333;
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid #444;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.meter-headline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.meter-title {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.meter-percentage {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #00ffaa;
+}
+
+.meter-track {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.meter-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #00ffaa, #00b894);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.meter-helper {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.65);
+}
+
 .option-group input[type="range"] {
   flex: 1;
   height: 5px;
@@ -325,27 +412,46 @@ textarea.error {
 
 /* Responsive styles */
 @media (max-width: 600px) {
+  .panel-intro {
+    text-align: center;
+  }
+
   .random-controls {
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .input-actions {
     flex-direction: column;
   }
-  
+
+  .input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-button {
+    width: 100%;
+  }
+
   .random-preview ul {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
-  
+
   .option-group {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  
+
   .option-group label {
     min-width: auto;
+  }
+
+  .meter-headline {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
   }
 }
 
@@ -353,6 +459,17 @@ textarea.error {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+}
+
+.form-error {
+  background: rgba(255, 77, 77, 0.16);
+  border: 1px solid rgba(255, 77, 77, 0.4);
+  color: #ffb3b3;
+  border-radius: 6px;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 0.9rem;
+  margin: -10px 0 18px;
 }
 
 .name-input {
@@ -476,6 +593,49 @@ textarea.error {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.suggestions-panel {
+  background: rgba(68, 68, 68, 0.5);
+  border: 1px solid rgba(129, 140, 248, 0.1);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.suggestions-label {
+  margin: 0 0 10px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.suggestion-chip {
+  background: rgba(100, 108, 255, 0.18);
+  color: #d8dcff;
+  border: 1px solid rgba(100, 108, 255, 0.4);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.suggestion-chip:hover:not(:disabled) {
+  background: rgba(100, 108, 255, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.suggestion-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .remove-name-btn {
