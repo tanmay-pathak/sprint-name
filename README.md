@@ -21,7 +21,7 @@ A fun and interactive game to help teams select sprint names through a competiti
 - Vite
 - Canvas Confetti
 - CSS Animations
-- Convex (for real-time backend)
+- PartyKit (for real-time backend)
 
 ## Installation
 
@@ -36,12 +36,17 @@ A fun and interactive game to help teams select sprint names through a competiti
    npm install
    ```
 
-3. Set up Convex:
-   ```
-   npx convex dev
-   ```
+3. Set up PartyKit:
+   - Create a `.env` file in the root directory (optional for local dev):
+     ```
+     VITE_PARTYKIT_HOST=localhost:1999
+     ```
+   - Start the PartyKit dev server:
+     ```
+     npm run partykit:dev
+     ```
 
-4. Start the development server:
+4. Start the development server (in a separate terminal):
    ```
    npm run dev
    ```
@@ -58,10 +63,10 @@ npm run build
 
 The build artifacts will be located in the `dist/` directory.
 
-For deploying the Convex backend:
+For deploying the PartyKit backend:
 
 ```
-npx convex deploy
+npm run partykit:deploy
 ```
 
 ## How to Use
@@ -72,13 +77,13 @@ npx convex deploy
 4. The winner will be your new sprint name
 5. Race results are automatically saved and synchronized across all users
 
-## Convex Backend
+## PartyKit Backend
 
-This application uses Convex as a backend service for:
+This application uses PartyKit as a backend service for:
 - Storing sprint name suggestions
 - Recording race results and history
-- Enabling real-time updates across multiple users
-- Managing user sessions
+- Enabling real-time updates across multiple users via WebSockets
+- Managing persistent state with PartyKit storage
 
 ## Show your support
 

@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import '../styles/SprintNameInput.css'
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
-import { Id } from "../../convex/_generated/dataModel";
+import { usePartyKit } from '../hooks/usePartyKit'
 
 interface SprintNameInputProps {
   onStart: (names: string[], duration: number) => void
@@ -25,11 +23,8 @@ const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) =>
   const [isRemoving, setIsRemoving] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  // Convex queries and mutations
-  const sprintNames = useQuery(api.sprintNames.listActiveSprintNames) || [];
-  const addSprintName = useMutation(api.sprintNames.addSprintName);
-  const clearActiveSprintNames = useMutation(api.sprintNames.clearActiveSprintNames);
-  const deactivateSprintName = useMutation(api.sprintNames.deactivateSprintName);
+  // PartyKit hook
+  const { sprintNames, addSprintName, clearActiveSprintNames, deactivateSprintName } = usePartyKit();
 
   const nameExists = (value: string) => {
     return sprintNames.some(item => item.name.toLowerCase() === value.toLowerCase())
@@ -50,7 +45,7 @@ const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) =>
     try {
       setIsAdding(true);
       setErrorMessage(null)
-      await addSprintName({ name: trimmed });
+      addSprintName(trimmed);
       setInput('');
     } catch (error) {
       console.error("Error adding name:", error);
@@ -78,7 +73,7 @@ const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) =>
         }
 
         setErrorMessage(null)
-        await addSprintName({ name: randomName });
+        addSprintName(randomName);
       } catch (error) {
         console.error("Error adding random name:", error);
         setErrorMessage('Could not add a random racer. Give it another go.');
@@ -88,11 +83,11 @@ const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) =>
     }
   }
 
-  const handleRemoveName = async (id: Id<"sprintNames">) => {
+  const handleRemoveName = async (id: string) => {
     if (!isRemoving) {
       try {
         setIsRemoving(id);
-        await deactivateSprintName({ id });
+        deactivateSprintName(id);
         setErrorMessage(null)
       } catch (error) {
         console.error("Error removing name:", error);
@@ -112,7 +107,7 @@ const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) =>
     if (!isAdding) {
       try {
         setIsAdding(true);
-        await clearActiveSprintNames();
+        clearActiveSprintNames();
         setErrorMessage(null)
       } catch (error) {
         console.error("Error clearing names:", error);
@@ -149,7 +144,7 @@ const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) =>
     try {
       setIsAdding(true)
       setErrorMessage(null)
-      await addSprintName({ name })
+      addSprintName(name)
     } catch (error) {
       console.error("Error adding suggestion:", error)
       setErrorMessage('Suggestion failed to join the race. Try again.')

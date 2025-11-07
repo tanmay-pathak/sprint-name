@@ -2,21 +2,18 @@ import { useState, useEffect } from 'react'
 import './App.css'
 import SprintNameInput from './components/SprintNameInput'
 import Race2D from './components/Race2D'
-import { useMutation, useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
+import { usePartyKit } from './hooks/usePartyKit'
 
 function App() {
   const [isRacing, setIsRacing] = useState(false)
   const [raceDuration, setRaceDuration] = useState(10)
   const [isCompletingRace, setIsCompletingRace] = useState(false)
   
-  // Convex queries and mutations
-  const names = useQuery(api.sprintNames.listActiveSprintNames) || [];
-  const saveWinner = useMutation(api.winners.saveWinner);
-  const latestWinner = useQuery(api.winners.getLatestWinner);
+  // PartyKit hook
+  const { sprintNames, latestWinner, saveWinner } = usePartyKit();
 
   // Mapping data for the frontend
-  const sprintNames = names.map(n => n.name);
+  const names = sprintNames.map(n => n.name);
   const winner = latestWinner?.name || null;
 
   // Reset isCompletingRace if we're not racing
@@ -36,8 +33,8 @@ function App() {
       // Flag that we're in the completion process
       setIsCompletingRace(true);
       
-      // Store the winner in the database
-      await saveWinner({ name: winnerName, raceDuration });
+      // Store the winner
+      saveWinner(winnerName, raceDuration);
       
       // Return to input screen
       setIsRacing(false);
@@ -83,8 +80,8 @@ function App() {
               <div className="stats-grid">
                 <div className="stat-card" role="status" aria-live="polite">
                   <p className="stat-label">Active racers</p>
-                  <p className="stat-value">{sprintNames.length}</p>
-                  <p className="stat-helper">{sprintNames.length >= 2 ? 'Ready to race!' : 'Add at least two racers to begin.'}</p>
+                  <p className="stat-value">{names.length}</p>
+                  <p className="stat-helper">{names.length >= 2 ? 'Ready to race!' : 'Add at least two racers to begin.'}</p>
                 </div>
 
                 <div className="stat-card">
@@ -119,7 +116,7 @@ function App() {
             {isCompletingRace ? 'Finishing...' : '← Back'}
           </button>
           <Race2D
-            names={sprintNames}
+            names={names}
             onRaceComplete={handleRaceComplete}
             raceDuration={raceDuration}
           />
