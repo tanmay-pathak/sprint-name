@@ -44,9 +44,9 @@ export function usePartyKit(roomId: string = 'main') {
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    // Determine the host - use environment variable or default to localhost for dev
+    // Determine the host - use environment variable, localhost for dev, or production URL
     const host = import.meta.env.VITE_PARTYKIT_HOST || 
-                 (import.meta.env.DEV ? 'localhost:1999' : undefined);
+                 (import.meta.env.DEV ? 'localhost:1999' : 'sprint-name-party.tanmay-pathak.partykit.dev');
     
     if (!host) {
       console.error('PartyKit host not configured');
@@ -55,7 +55,7 @@ export function usePartyKit(roomId: string = 'main') {
 
     // Construct WebSocket URL
     // For local dev: ws://localhost:1999/party/main
-    // For production: wss://your-project.partykit.dev/party/main
+    // For production: wss://sprint-name-party.tanmay-pathak.partykit.dev/party/main
     const protocol = host.includes('localhost') || host.includes('127.0.0.1') ? 'ws' : 'wss';
     const wsUrl = `${protocol}://${host}/party/${roomId}`;
     
