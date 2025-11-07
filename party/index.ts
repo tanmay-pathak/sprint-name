@@ -27,6 +27,7 @@ export default class Server implements Party.Server {
   winners: Array<{ name: string; raceDuration: number; timestamp: number }>;
   raceState: RaceState | null = null;
   raceUpdateInterval: ReturnType<typeof setInterval> | null = null;
+  raceDuration: number = 10; // Default race duration, synced across all clients
 
   constructor(public room: Party.Room) {
     this.sprintNames = new Map();
@@ -38,6 +39,7 @@ export default class Server implements Party.Server {
     const stored = await this.room.storage.get<{
       sprintNames: Array<{ name: string; active: boolean; id: string }>;
       winners: Array<{ name: string; raceDuration: number; timestamp: number }>;
+      raceDuration?: number;
     }>("state");
 
     if (stored) {
@@ -45,6 +47,7 @@ export default class Server implements Party.Server {
         stored.sprintNames.map((item) => [item.id, item])
       );
       this.winners = stored.winners || [];
+      this.raceDuration = stored.raceDuration || 10;
     }
   }
 
@@ -87,6 +90,9 @@ export default class Server implements Party.Server {
           break;
         case "getRaceState":
           this.sendRaceState(sender);
+          break;
+        case "updateRaceDuration":
+          this.handleUpdateRaceDuration(data.raceDuration);
           break;
         default:
           console.warn("Unknown message type:", data.type);
@@ -155,6 +161,7 @@ export default class Server implements Party.Server {
     return {
       sprintNames: this.getActiveSprintNames(),
       latestWinner: this.getLatestWinner(),
+      raceDuration: this.raceDuration,
     };
   }
 
@@ -167,10 +174,19 @@ export default class Server implements Party.Server {
     this.room.broadcast(JSON.stringify({ type: "state", ...state }));
   }
 
+  async handleUpdateRaceDuration(raceDuration: number) {
+    // Validate race duration (between 5 and 20 seconds)
+    const validDuration = Math.max(5, Math.min(20, raceDuration));
+    this.raceDuration = validDuration;
+    await this.saveState();
+    this.broadcastState();
+  }
+
   async saveState() {
     await this.room.storage.put("state", {
       sprintNames: Array.from(this.sprintNames.values()),
       winners: this.winners,
+      raceDuration: this.raceDuration,
     });
   }
 

@@ -6,11 +6,10 @@ import { usePartyKit } from './hooks/usePartyKit'
 
 function App() {
   const [isRacing, setIsRacing] = useState(false)
-  const [raceDuration, setRaceDuration] = useState(10)
   const [isCompletingRace, setIsCompletingRace] = useState(false)
   
-  // PartyKit hook
-  const { sprintNames, latestWinner, saveWinner, raceState, startRace } = usePartyKit();
+  // PartyKit hook - raceDuration is now synced from server
+  const { sprintNames, latestWinner, saveWinner, raceState, startRace, raceDuration } = usePartyKit();
 
   // Mapping data for the frontend
   const names = sprintNames.map(n => n.name);
@@ -25,7 +24,6 @@ function App() {
       
       if (isRacingFromState) {
         setIsRacing(true);
-        setRaceDuration(raceState.raceDuration);
       }
       
       // Handle race completion
@@ -48,7 +46,6 @@ function App() {
   }, [isRacing]);
 
   const handleStartRace = (names: string[], duration: number) => {
-    setRaceDuration(duration);
     // Start race via PartyKit - this will sync to all clients
     startRace(names, duration);
     setIsRacing(true);
@@ -125,7 +122,6 @@ function App() {
 
             <SprintNameInput
               onStart={handleStartRace}
-              onDurationChange={(duration) => setRaceDuration(duration)}
             />
           </div>
         </div>

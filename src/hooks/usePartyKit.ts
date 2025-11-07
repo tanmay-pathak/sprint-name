@@ -44,6 +44,7 @@ export function usePartyKit(roomId: string = 'main') {
   const [sprintNames, setSprintNames] = useState<SprintName[]>([]);
   const [latestWinner, setLatestWinner] = useState<Winner | null>(null);
   const [raceState, setRaceState] = useState<RaceState | null>(null);
+  const [raceDuration, setRaceDuration] = useState<number>(10);
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
 
@@ -91,6 +92,9 @@ export function usePartyKit(roomId: string = 'main') {
         if (data.type === 'state') {
           setSprintNames(data.sprintNames || []);
           setLatestWinner(data.latestWinner || null);
+          if (data.raceDuration !== undefined) {
+            setRaceDuration(data.raceDuration);
+          }
         } else if (data.type === 'raceState') {
           setRaceState(data.raceState || null);
         }
@@ -133,16 +137,22 @@ export function usePartyKit(roomId: string = 'main') {
     sendMessage({ type: 'startRace', names, raceDuration });
   };
 
+  const updateRaceDuration = (duration: number) => {
+    sendMessage({ type: 'updateRaceDuration', raceDuration: duration });
+  };
+
   return {
     sprintNames,
     latestWinner,
     raceState,
+    raceDuration,
     isConnected,
     addSprintName,
     deactivateSprintName,
     clearActiveSprintNames,
     saveWinner,
     startRace,
+    updateRaceDuration,
   };
 }
 

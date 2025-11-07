@@ -1,10 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import '../styles/SprintNameInput.css'
 import { usePartyKit } from '../hooks/usePartyKit'
 
 interface SprintNameInputProps {
   onStart: (names: string[], duration: number) => void
-  onDurationChange?: (duration: number) => void
 }
 
 // Fun sprint name suggestions
@@ -14,17 +13,14 @@ const SPRINT_NAME_SUGGESTIONS = [
   "Titan Trek", "Comet Charge"
 ];
 
-const DEFAULT_RACE_DURATION = 10; // 10 seconds default
-
-const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) => {
+const SprintNameInput = ({ onStart }: SprintNameInputProps) => {
   const [input, setInput] = useState('')
-  const [raceDuration, setRaceDuration] = useState(DEFAULT_RACE_DURATION)
   const [isAdding, setIsAdding] = useState(false)
   const [isRemoving, setIsRemoving] = useState<string | null>(null)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  // PartyKit hook
-  const { sprintNames, addSprintName, clearActiveSprintNames, deactivateSprintName } = usePartyKit();
+  // PartyKit hook - raceDuration is synced from server
+  const { sprintNames, addSprintName, clearActiveSprintNames, deactivateSprintName, raceDuration, updateRaceDuration } = usePartyKit();
 
   const nameExists = (value: string) => {
     return sprintNames.some(item => item.name.toLowerCase() === value.toLowerCase())
@@ -153,9 +149,6 @@ const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) =>
     }
   }
 
-  useEffect(() => {
-    onDurationChange?.(raceDuration)
-  }, [raceDuration, onDurationChange])
 
   const readinessTarget = 6
   const readinessPercentage = Math.min(100, Math.round((sprintNames.length / readinessTarget) * 100))
@@ -276,7 +269,7 @@ const SprintNameInput = ({ onStart, onDurationChange }: SprintNameInputProps) =>
             max="20" 
             step="1"
             value={raceDuration} 
-            onChange={(e) => setRaceDuration(parseInt(e.target.value))}
+            onChange={(e) => updateRaceDuration(parseInt(e.target.value))}
           />
           <span className="range-value">{raceDuration}s</span>
         </div>
