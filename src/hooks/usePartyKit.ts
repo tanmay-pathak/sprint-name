@@ -13,6 +13,28 @@ interface Winner {
   timestamp: number;
 }
 
+interface Racer {
+  name: string;
+  position: number;
+  speed: number;
+  baseSpeed: number;
+  lane: number;
+  wobble: number;
+  finishTime: number | null;
+  boostTime: number;
+  slowTime: number;
+}
+
+interface RaceState {
+  status: 'idle' | 'countdown' | 'racing' | 'finished';
+  countdown: number;
+  startTime: number | null;
+  raceDuration: number;
+  racers: Racer[];
+  winner: string | null;
+  lastUpdate: number;
+}
+
 interface PartyState {
   sprintNames: SprintName[];
   latestWinner: Winner | null;
@@ -21,6 +43,7 @@ interface PartyState {
 export function usePartyKit(roomId: string = 'main') {
   const [sprintNames, setSprintNames] = useState<SprintName[]>([]);
   const [latestWinner, setLatestWinner] = useState<Winner | null>(null);
+  const [raceState, setRaceState] = useState<RaceState | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
 
@@ -49,6 +72,8 @@ export function usePartyKit(roomId: string = 'main') {
       setIsConnected(true);
       // Request initial state
       socket.send(JSON.stringify({ type: 'getState' }));
+      // Request race state
+      socket.send(JSON.stringify({ type: 'getRaceState' }));
     };
 
     socket.onclose = () => {
@@ -66,6 +91,8 @@ export function usePartyKit(roomId: string = 'main') {
         if (data.type === 'state') {
           setSprintNames(data.sprintNames || []);
           setLatestWinner(data.latestWinner || null);
+        } else if (data.type === 'raceState') {
+          setRaceState(data.raceState || null);
         }
       } catch (error) {
         console.error('Error parsing PartyKit message:', error);
@@ -102,14 +129,20 @@ export function usePartyKit(roomId: string = 'main') {
     sendMessage({ type: 'saveWinner', name, raceDuration });
   };
 
+  const startRace = (names: string[], raceDuration: number) => {
+    sendMessage({ type: 'startRace', names, raceDuration });
+  };
+
   return {
     sprintNames,
     latestWinner,
+    raceState,
     isConnected,
     addSprintName,
     deactivateSprintName,
     clearActiveSprintNames,
     saveWinner,
+    startRace,
   };
 }
 

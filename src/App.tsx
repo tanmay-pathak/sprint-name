@@ -10,11 +10,35 @@ function App() {
   const [isCompletingRace, setIsCompletingRace] = useState(false)
   
   // PartyKit hook
-  const { sprintNames, latestWinner, saveWinner } = usePartyKit();
+  const { sprintNames, latestWinner, saveWinner, raceState, startRace } = usePartyKit();
 
   // Mapping data for the frontend
   const names = sprintNames.map(n => n.name);
   const winner = latestWinner?.name || null;
+
+  // Sync local racing state with PartyKit race state
+  useEffect(() => {
+    if (raceState) {
+      const isRacingFromState = raceState.status === 'countdown' || 
+                                 raceState.status === 'racing' || 
+                                 raceState.status === 'finished';
+      
+      if (isRacingFromState) {
+        setIsRacing(true);
+        setRaceDuration(raceState.raceDuration);
+      }
+      
+      // Handle race completion
+      if (raceState.status === 'finished' && raceState.winner && !isCompletingRace) {
+        setIsCompletingRace(true);
+        saveWinner(raceState.winner, raceState.raceDuration);
+        // Return to input after delay
+        setTimeout(() => {
+          setIsRacing(false);
+        }, 2000);
+      }
+    }
+  }, [raceState, isCompletingRace, saveWinner]);
 
   // Reset isCompletingRace if we're not racing
   useEffect(() => {
@@ -23,8 +47,10 @@ function App() {
     }
   }, [isRacing]);
 
-  const handleStartRace = (_names: string[], duration: number) => {
+  const handleStartRace = (names: string[], duration: number) => {
     setRaceDuration(duration);
+    // Start race via PartyKit - this will sync to all clients
+    startRace(names, duration);
     setIsRacing(true);
   }
 
@@ -36,12 +62,9 @@ function App() {
       // Store the winner
       saveWinner(winnerName, raceDuration);
       
-      // Return to input screen
-      setIsRacing(false);
+      // Don't set isRacing to false here - let the useEffect handle it based on raceState
     } catch (error) {
       console.error("Error saving winner:", error);
-      // Still return to input screen even on error
-      setIsRacing(false);
     }
   }
 
@@ -119,6 +142,7 @@ function App() {
             names={names}
             onRaceComplete={handleRaceComplete}
             raceDuration={raceDuration}
+            raceState={raceState}
           />
         </div>
       )}
