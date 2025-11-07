@@ -35,11 +35,6 @@ interface RaceState {
   lastUpdate: number;
 }
 
-interface PartyState {
-  sprintNames: SprintName[];
-  latestWinner: Winner | null;
-}
-
 export function usePartyKit(roomId: string = 'main') {
   const [sprintNames, setSprintNames] = useState<SprintName[]>([]);
   const [latestWinner, setLatestWinner] = useState<Winner | null>(null);
